@@ -268,7 +268,7 @@ class QhCollect implements Collect
         $url = $this->domin . "/filter/list?" . http_build_query($query);
         $result = FunctionUnit::http_request($url, "get");
         $datas = json_decode($result, 1);
-        if ($datas && $datas["errno"] == 0&&!empty($datas["data"])) {
+        if ($datas && $datas["errno"] == 0 && !empty($datas["data"])) {
             foreach ($datas["data"]["movies"] as $data) {
                 $vodlist["url"] = FunctionUnit::UrlParse($query["catid"] . "/" . $data["id"]);
                 $vodlist["img"] = $data["cdncover"] ?? "";
@@ -294,7 +294,7 @@ class QhCollect implements Collect
         $results = FunctionUnit::http_multi($url);
         foreach ($results as $key => $result) {
             $datas = json_decode($result, 1);
-            if ($datas && $datas["errno"] == 0&&!empty($datas["data"])) {
+            if ($datas && $datas["errno"] == 0 && !empty($datas["data"])) {
                 $temp = [];
                 foreach ($datas["data"]["movies"] as $data) {
                     $vodlist["url"] = FunctionUnit::UrlParse(FunctionUnit::ParseConfig($this->typeconfig, $key) . "/" . $data["id"]);
@@ -315,12 +315,12 @@ class QhCollect implements Collect
     public function VodRank(array $params = [])
     {
         $vodlists = [];
-        $catids = ["mv"=>2,"tv"=>3,"va"=>4,"ct"=>5];
-        $catid = $catids[$params["channel"]??"mv"];
-        $url = $this->domin."/rank?".http_build_query(["cat"=>$catid]);
+        $catids = ["mv" => 2, "tv" => 3, "va" => 4, "ct" => 5];
+        $catid = $catids[$params["channel"] ?? "mv"];
+        $url = $this->domin . "/rank?" . http_build_query(["cat" => $catid]);
         $result = FunctionUnit::http_request($url, "get");
         $datas = json_decode($result, 1);
-        if ($datas && $datas["errno"] == 0&&!empty($datas["data"])) {
+        if ($datas && $datas["errno"] == 0 && !empty($datas["data"])) {
             foreach ($datas["data"] as $data) {
                 $vodlist["url"] = FunctionUnit::UrlParse($data["cat"] . "/" . $data["ent_id"]);
                 $vodlist["img"] = $data["cover"] ?? "";
@@ -339,14 +339,14 @@ class QhCollect implements Collect
     {
         $vodlists = [];
         $urls = [];
-        $catids = ["mv"=>2,"tv"=>3,"va"=>4,"ct"=>5];
-        foreach ($catids as $key=>$catid){
-            $urls[$key] = $this->domin."/rank?".http_build_query(["cat"=>$catid]);
+        $catids = ["mv" => 2, "tv" => 3, "va" => 4, "ct" => 5];
+        foreach ($catids as $key => $catid) {
+            $urls[$key] = $this->domin . "/rank?" . http_build_query(["cat" => $catid]);
         }
         $results = FunctionUnit::http_multi($urls);
-        foreach ($results as $key=>$result){
+        foreach ($results as $key => $result) {
             $datas = json_decode($result, 1);
-            if ($datas && $datas["errno"] == 0&&!empty($datas["data"])) {
+            if ($datas && $datas["errno"] == 0 && !empty($datas["data"])) {
                 $temp = [];
                 foreach ($datas["data"] as $data) {
                     $vodlist["url"] = FunctionUnit::UrlParse($data["cat"] . "/" . $data["ent_id"]);
@@ -375,7 +375,7 @@ class QhCollect implements Collect
         if ($data && $data["errno"] == 0) {
             $detail = $data["data"];
             $info = ["title" => $detail["title"], "img" => $detail["cdncover"], "director" => implode("/", $detail["director"]), "actor" => implode("/", $detail["actor"]), "area" => implode("/", $detail["area"]), "kind" => implode("/", $detail["moviecategory"]), "desc" => $detail["description"]];
-            if (in_array($cat, [2,3,4])) {
+            if (in_array($cat, [2, 3, 4])) {
                 $playurl = [];
                 if (isset($detail["allupinfo"]) && !empty($detail["allupinfo"])) {
                     foreach ($detail["allupinfo"] as $site => $end) {
@@ -389,11 +389,11 @@ class QhCollect implements Collect
                         }
                         $temp["type"] = $type;
                         $templist = [];
-                        if ($cat==3){
+                        if ($cat == 3) {
                             foreach ($playlistdata = $playdataarr["data"]["defaultepisode"] as $link) {
                                 $templist[] = ["episode" => $link["pubdate"], "address" => $link["url"]];
                             }
-                        }else{
+                        } else {
                             foreach ($playdataarr["data"]["allepidetail"][$type] as $link) {
                                 $templist[] = ["episode" => $link["playlink_num"], "address" => $link["url"]];
                             }
@@ -440,19 +440,22 @@ class QhCollect implements Collect
         $url = "https://api.so.360kan.com/index?" . http_build_query($params);
         $result = FunctionUnit::http_request($url, "get");
         $datas = json_decode($result, 1);
-        if ($datas && $datas["code"] == 0 &&isset($datas["data"]["longData"]["rows"])) {
-            foreach ($datas["data"]["longData"]["rows"] as $data) {
-                $vodlist["url"] = FunctionUnit::UrlParse($data["cat_id"] . "/" . $data["en_id"]);
-                $vodlist["img"] = $data["cover"] ?? "";
-                $vodlist["title"] = $data["titleTxt"] ?? "easyvod";
-                $vodlist["episode"] = $data["upinfo"] ?? 0;
-                $vodlist["kind"] = isset($data["tag"])?implode("/",$data["tag"]):"";
-                $vodlist["channel"] = $data["cat_name"]??"未知";
-                $vodlist["desc"] = $data["description"]??"";
-                $vodlist["year"] = $data["year"] ?? "2021";
-                $vodlist["score"] = rand(5, 9) . "." . rand(0, 9);
-                $vodlist["pay"] = $data["vip"] ?? 0;
-                $vodlists[] = $vodlist;
+        if ($datas && $datas["code"] == 0) {
+            $longdata = $datas["data"]["longData"];
+            if (isset($longdata["rows"])) {
+                foreach ($datas["data"]["longData"]["rows"] as $data) {
+                    $vodlist["url"] = FunctionUnit::UrlParse($data["cat_id"] . "/" . $data["en_id"]);
+                    $vodlist["img"] = $data["cover"] ?? "";
+                    $vodlist["title"] = $data["titleTxt"] ?? "easyvod";
+                    $vodlist["episode"] = $data["upinfo"] ?? 0;
+                    $vodlist["kind"] = isset($data["tag"]) ? implode("/", $data["tag"]) : "";
+                    $vodlist["channel"] = $data["cat_name"] ?? "未知";
+                    $vodlist["desc"] = $data["description"] ?? "";
+                    $vodlist["year"] = $data["year"] ?? "2021";
+                    $vodlist["score"] = rand(5, 9) . "." . rand(0, 9);
+                    $vodlist["pay"] = $data["vip"] ?? 0;
+                    $vodlists[] = $vodlist;
+                }
             }
         }
         return $vodlists;
