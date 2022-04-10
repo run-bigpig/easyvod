@@ -440,7 +440,7 @@ class QhCollect implements Collect
         $url = "https://api.so.360kan.com/index?" . http_build_query($params);
         $result = FunctionUnit::http_request($url, "get");
         $datas = json_decode($result, 1);
-        if ($datas && $datas["code"] == 0) {
+        if ($datas && $datas["code"] == 0 &&isset($datas["data"]["longData"]["rows"])) {
             foreach ($datas["data"]["longData"]["rows"] as $data) {
                 $vodlist["url"] = FunctionUnit::UrlParse($data["cat_id"] . "/" . $data["en_id"]);
                 $vodlist["img"] = $data["cover"] ?? "";
